@@ -6,3 +6,4 @@ TCP port scan, on list of hosts (like Nmap)
 
 
 Using Cobra CLI Framework
+- $ go get -u github.com/spf13/cobra@latest
