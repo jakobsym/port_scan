@@ -1,8 +1,10 @@
 package scan
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
+	"os"
 	"sort"
 )
 
@@ -38,6 +40,7 @@ func (hl *HostsList) Add(host string) error {
 	return nil
 }
 
+// remove a host from slice
 func (hl *HostsList) Remove(host string) error {
 	found, index := hl.Search(host)
 	if !found {
@@ -45,4 +48,33 @@ func (hl *HostsList) Remove(host string) error {
 	}
 	hl.Hosts = append(hl.Hosts[:index], hl.Hosts[index+1:]...)
 	return nil
+}
+
+// Obtain 'hosts' from a hosts file
+func (hl *HostsList) Load(hostFile string) error {
+	f, err := os.Open(hostFile)
+
+	// cant open file
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return nil
+		}
+		return err
+	}
+
+	defer f.Close()
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		hl.Hosts = append(hl.Hosts, scanner.Text())
+	}
+	return nil
+}
+
+// Save 'hosts' to a hosts file
+func (hl *HostsList) Save(hostFile string) error {
+	output := ""
+	for _, h := range hl.Hosts {
+		output += fmt.Sprintln(h)
+	}
+	return os.WriteFile(hostFile, []byte(output), 0644) // rw: owner && r: others
 }

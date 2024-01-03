@@ -1,6 +1,5 @@
 /*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-
+Copyright © 2023 Jakob Symchych <jakob.symchych@utsa.edu>
 */
 package main
 
