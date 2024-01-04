@@ -8,7 +8,7 @@ import (
 
 func TestAdd(t *testing.T) {
 	// Create test cases
-	var testCases = []struct {
+	testCases := []struct {
 		name      string
 		host      string
 		expectLen int
@@ -50,6 +50,55 @@ func TestAdd(t *testing.T) {
 			}
 			if hl.Hosts[1] != tc.host {
 				t.Fatalf("Expected host name: %q, got %q instead.\n", tc.host, hl.Hosts[1])
+			}
+		})
+	}
+}
+
+func TestRemove(t *testing.T) {
+
+	testCases := []struct {
+		name      string
+		host      string
+		expectLen int
+		expectErr error
+	}{
+		{"RemoveExist", "host1", 1, nil},
+		{"RemoveNotFound", "host4", 1, scan.ErrNotExists},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			hl := &scan.HostsList{}
+
+			// Add hosts to HostList{}
+			for _, h := range []string{"host1", "host2"} {
+				if err := hl.Add(h); err != nil {
+					t.Fatal(err)
+				}
+			}
+
+			err := hl.Remove(tc.host)
+
+			if tc.expectErr != nil {
+				if err == nil {
+					t.Fatalf("Expected error, got 'nil' instead.\n")
+				}
+
+				if !errors.Is(err, tc.expectErr) {
+					t.Errorf("Expected error: %q, got %q instead.\n", tc.expectErr, err)
+				}
+				return
+			}
+
+			if err != nil {
+				t.Fatalf("Expected nil, got %q instead.\n", err)
+			}
+			if len(hl.Hosts) != tc.expectLen {
+				t.Fatalf("Expected: %q, got %q instead.\n", tc.expectLen, len(hl.Hosts))
+			}
+			if hl.Hosts[0] == tc.host {
+				t.Fatalf("Host name: %q should not be in the list\n", tc.host)
 			}
 		})
 	}

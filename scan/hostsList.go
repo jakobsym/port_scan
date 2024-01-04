@@ -44,7 +44,7 @@ func (hl *HostsList) Add(host string) error {
 func (hl *HostsList) Remove(host string) error {
 	found, index := hl.Search(host)
 	if !found {
-		return fmt.Errorf("%w: %s", ErrExists, host)
+		return fmt.Errorf("%w: %s", ErrNotExists, host)
 	}
 	hl.Hosts = append(hl.Hosts[:index], hl.Hosts[index+1:]...)
 	return nil
